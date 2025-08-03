@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "${PORT:-7392}:3000"
+      - "7392:3000"
     environment:
       - NODE_ENV=${NODE_ENV:-production}
       - PORT=3000
