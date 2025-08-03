@@ -28,18 +28,24 @@ const wss = new WebSocketServer({ server });
 // Setup WebSocket
 setupWebSocket(wss);
 
-// Middleware
+// Middleware - 针对 HTTP 环境优化的安全配置
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      fontSrc: ["'self'"],
-      imgSrc: ["'self'", "data:"],
-      connectSrc: ["'self'", "ws:", "wss:"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      fontSrc: ["'self'", "data:"],
+      imgSrc: ["'self'", "data:", "blob:"],
+      connectSrc: ["'self'", "ws:", "wss:", "http:", "https:"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["'none'"],
     },
   },
+  crossOriginOpenerPolicy: false, // 在 HTTP 环境下禁用
+  crossOriginResourcePolicy: false, // 在 HTTP 环境下禁用
+  originAgentCluster: false, // 在 HTTP 环境下禁用
 }));
 
 app.use(cors({
@@ -62,6 +68,11 @@ app.use('/api', apiRouter);
 // Serve the web interface
 app.get('/', (_req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
+// Test page
+app.get('/test', (_req, res) => {
+  res.sendFile(path.join(__dirname, '../public/test.html'));
 });
 
 // Health check
