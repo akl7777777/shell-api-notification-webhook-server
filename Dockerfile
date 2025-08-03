@@ -9,7 +9,8 @@ COPY package*.json ./
 COPY prisma ./prisma/
 
 # 安装依赖（包括开发依赖）
-RUN npm ci
+# 使用 npm install 自动生成 package-lock.json
+RUN npm install
 
 # 复制源代码
 COPY . .
@@ -41,7 +42,8 @@ COPY package*.json ./
 COPY prisma ./prisma/
 
 # 只安装生产依赖
-RUN npm ci --only=production && npm cache clean --force
+# 使用 npm install 自动生成 package-lock.json
+RUN npm install --only=production && npm cache clean --force
 
 # 从构建阶段复制构建产物
 COPY --from=builder /app/dist ./dist
