@@ -20,6 +20,10 @@
   ],
   "author": "",
   "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  },
   "dependencies": {
     "@elastic/elasticsearch": "^9.1.0",
     "@prisma/client": "^5.7.1",
