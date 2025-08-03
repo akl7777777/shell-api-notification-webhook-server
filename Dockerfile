@@ -24,10 +24,11 @@ RUN npm run build
 # 生产阶段
 FROM node:20-alpine AS production
 
-# 安装必要的系统依赖
+# 安装必要的系统依赖，包括 Prisma 需要的 OpenSSL
 RUN apk add --no-cache \
     curl \
     dumb-init \
+    openssl1.1-compat \
     && rm -rf /var/cache/apk/*
 
 # 创建非 root 用户
