@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhook 消息管理</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --dark-gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --card-shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-header {
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .main-header h1 {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .main-header p {
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
+        .stats-card {
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 15px;
+            border: none;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .stats-card:nth-child(2) .card {
+            background: var(--success-gradient);
+        }
+
+        .stats-card:nth-child(3) .card {
+            background: var(--info-gradient);
+        }
+
+        .stats-card:nth-child(4) .card {
+            background: var(--warning-gradient);
+        }
+
+        .stats-card .card-body {
+            padding: 1.5rem;
+        }
+
+        .stats-card h3 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-card small {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .filter-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .btn {
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: var(--success-gradient);
+            border: none;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(17, 153, 142, 0.4);
+        }
+
+        .message-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: none;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .message-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--primary-gradient);
+        }
+
+        .message-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .message-card.new-message {
+            animation: slideInRight 0.5s ease-out;
+        }
+
+        .message-card.new-message::before {
+            background: var(--success-gradient);
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .type-badge {
+            font-size: 0.75rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .badge-test {
+            background: var(--info-gradient);
+            color: white;
+        }
+
+        .badge-quota_exceed {
+            background: var(--warning-gradient);
+            color: white;
+        }
+
+        .badge-security_alert {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+
+        .connection-status .alert {
+            border-radius: 15px;
+            border: none;
+            box-shadow: var(--card-shadow);
+            backdrop-filter: blur(10px);
+        }
+
+        .message-content {
+            max-height: 100px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #667eea #f1f1f1;
+        }
+
+        .message-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .message-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .message-content::-webkit-scrollbar-thumb {
+            background: var(--primary-gradient);
+            border-radius: 3px;
+        }
+
+        .timestamp {
+            font-size: 0.875rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .loading-spinner {
+            display: none;
+        }
+
+        .loading .loading-spinner {
+            display: inline-block;
+        }
+
+        .pagination .page-link {
+            border-radius: 10px;
+            margin: 0 2px;
+            border: none;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .pagination .page-item.active .page-link {
+            background: var(--primary-gradient);
+            border: none;
+        }
+
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .modal-header {
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .card {
+            border-radius: 15px;
+            border: none;
+            box-shadow: var(--card-shadow);
+        }
+
+        .card-header {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 15px 15px 0 0;
+            border: none;
+        }
+
+        .alert {
+            border-radius: 15px;
+            border: none;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-header {
+                padding: 1.5rem;
+                text-align: center;
+            }
+
+            .filter-section {
+                padding: 1.5rem;
+            }
+
+            .stats-card h3 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <!-- Connection Status -->
+        <div id="connectionStatus" class="connection-status">
+            <div class="alert alert-info alert-dismissible" role="alert">
+                <i class="bi bi-wifi"></i> 正在连接...
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div class="main-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-5 mb-0">
+                        <i class="bi bi-webhook me-3"></i>Webhook 消息管理中心
+                    </h1>
+                    <p class="mt-2 mb-0">实时监控和管理 webhook 通知消息，支持高级搜索和数据分析</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="d-flex justify-content-end align-items-center">
+                        <div class="me-3">
+                            <small class="d-block opacity-75">系统状态</small>
+                            <span class="badge bg-success">
+                                <i class="bi bi-check-circle me-1"></i>运行正常
+                            </span>
+                        </div>
+                        <div>
+                            <small class="d-block opacity-75">实时连接</small>
+                            <span id="realTimeStatus" class="badge bg-info">
+                                <i class="bi bi-wifi me-1"></i>已连接
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="row mb-4 g-4">
+            <div class="col-lg-3 col-md-6 stats-card">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i class="bi bi-envelope-check display-4"></i>
+                        </div>
+                        <h3 id="totalMessages" class="mb-2">-</h3>
+                        <small class="text-uppercase tracking-wide">总消息数</small>
+                        <div class="mt-2">
+                            <small class="opacity-75">累计接收</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 stats-card">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i class="bi bi-clock-history display-4"></i>
+                        </div>
+                        <h3 id="last24Hours" class="mb-2">-</h3>
+                        <small class="text-uppercase tracking-wide">24小时内</small>
+                        <div class="mt-2">
+                            <small class="opacity-75">最近活动</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 stats-card">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i class="bi bi-people display-4"></i>
+                        </div>
+                        <h3 id="connectedClients" class="mb-2">-</h3>
+                        <small class="text-uppercase tracking-wide">在线客户端</small>
+                        <div class="mt-2">
+                            <small class="opacity-75">实时连接</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 stats-card">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i class="bi bi-file-earmark-text display-4"></i>
+                        </div>
+                        <h3 id="currentPage" class="mb-2">1</h3>
+                        <small class="text-uppercase tracking-wide">当前页</small>
+                        <div class="mt-2">
+                            <small class="opacity-75">分页浏览</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0">
+                    <i class="bi bi-funnel me-2"></i>筛选和搜索
+                </h5>
+                <div class="d-flex gap-2">
+                    <button id="advancedSearchBtn" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-search"></i> 高级搜索
+                    </button>
+                    <button id="systemStatusBtn" class="btn btn-outline-info btn-sm">
+                        <i class="bi bi-activity"></i> 系统状态
+                    </button>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6">
+                    <label for="typeFilter" class="form-label fw-semibold">
+                        <i class="bi bi-tag me-1"></i>消息类型
+                    </label>
+                    <select id="typeFilter" class="form-select">
+                        <option value="">🔍 全部类型</option>
+                        <option value="quota_exceed">⚠️ 额度超限</option>
+                        <option value="balance_low">💰 余额不足</option>
+                        <option value="channel_update">🔄 渠道更新</option>
+                        <option value="channel_test">🧪 渠道测试</option>
+                        <option value="security_alert">🔒 安全警报</option>
+                        <option value="system_announcement">📢 系统公告</option>
+                        <option value="test">🔧 测试消息</option>
+                    </select>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <label for="searchInput" class="form-label fw-semibold">
+                        <i class="bi bi-search me-1"></i>快速搜索
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" id="searchInput" class="form-control" placeholder="搜索标题、内容或ID...">
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <label for="startDate" class="form-label fw-semibold">
+                        <i class="bi bi-calendar-event me-1"></i>开始日期
+                    </label>
+                    <input type="date" id="startDate" class="form-control">
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <label for="endDate" class="form-label fw-semibold">
+                        <i class="bi bi-calendar-check me-1"></i>结束日期
+                    </label>
+                    <input type="date" id="endDate" class="form-control">
+                </div>
+                <div class="col-lg-1 col-md-12">
+                    <label class="form-label fw-semibold">&nbsp;</label>
+                    <div class="d-grid">
+                        <button id="refreshBtn" class="btn btn-primary">
+                            <span class="loading-spinner spinner-border spinner-border-sm me-2" role="status"></span>
+                            <i class="bi bi-arrow-clockwise me-1"></i>刷新
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Search Panel -->
+            <div id="advancedSearchPanel" class="mt-3" style="display: none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="bi bi-search"></i> 高级搜索</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <input type="text" id="advancedSearchInput" class="form-control"
+                                       placeholder="输入搜索查询 (支持复杂搜索语法)...">
+                                <small class="form-text text-muted">
+                                    支持全文搜索、字段搜索等高级功能
+                                </small>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-success" onclick="webhookManager.performAdvancedSearch()">
+                                    <i class="bi bi-search"></i> 搜索
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Status Panel -->
+            <div id="systemStatusPanel" class="mt-3" style="display: none;">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0"><i class="bi bi-activity"></i> 系统状态</h6>
+                        <div>
+                            <button id="cleanupBtn" class="btn btn-outline-warning btn-sm">
+                                <i class="bi bi-trash"></i> 清理旧数据
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm" onclick="webhookManager.loadSystemStatus()">
+                                <i class="bi bi-arrow-clockwise"></i> 刷新
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="systemStatusContent">
+                            <div class="text-center">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2">加载系统状态中...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages List -->
+        <div class="row">
+            <div class="col">
+                <div id="messagesContainer">
+                    <!-- Messages will be loaded here -->
+                </div>
+                
+                <!-- Pagination -->
+                <nav aria-label="消息分页" class="mt-4">
+                    <ul id="pagination" class="pagination justify-content-center">
+                        <!-- Pagination will be generated here -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message Detail Modal -->
+    <div class="modal fade" id="messageModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">消息详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="messageModalBody">
+                    <!-- Message details will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    <button type="button" id="markProcessedBtn" class="btn btn-success">标记为已处理</button>
+                    <button type="button" id="deleteMessageBtn" class="btn btn-danger">删除消息</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

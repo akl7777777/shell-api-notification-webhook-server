@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # Webhook Server - 主应用
+  webhook-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${PORT:-7392}:3000"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=3000
+      - HOST=0.0.0.0
+
+      # 存储配置 - 支持远程数据库
+      - PRIMARY_STORAGE_TYPE=${PRIMARY_STORAGE_TYPE:-sqlite}
+
+      # SQLite 配置（默认）
+      - PRIMARY_STORAGE_URL=${PRIMARY_STORAGE_URL:-file:./webhook.db}
+
+      # PostgreSQL 远程配置
+      - PRIMARY_STORAGE_HOST=${PRIMARY_STORAGE_HOST:-}
+      - PRIMARY_STORAGE_PORT=${PRIMARY_STORAGE_PORT:-}
+      - PRIMARY_STORAGE_DATABASE=${PRIMARY_STORAGE_DATABASE:-}
+      - PRIMARY_STORAGE_USERNAME=${PRIMARY_STORAGE_USERNAME:-}
+      - PRIMARY_STORAGE_PASSWORD=${PRIMARY_STORAGE_PASSWORD:-}
+      - PRIMARY_STORAGE_SSL=${PRIMARY_STORAGE_SSL:-false}
+
+      # MySQL 远程配置
+      - PRIMARY_STORAGE_MAX_CONNECTIONS=${PRIMARY_STORAGE_MAX_CONNECTIONS:-10}
+      - PRIMARY_STORAGE_TIMEOUT=${PRIMARY_STORAGE_TIMEOUT:-30000}
+
+      # Elasticsearch 远程配置
+      - PRIMARY_STORAGE_INDEX=${PRIMARY_STORAGE_INDEX:-webhook-messages}
+
+      # 备用存储配置
+      - ENABLE_FALLBACK_STORAGE=${ENABLE_FALLBACK_STORAGE:-false}
+      - FALLBACK_STORAGE_TYPE=${FALLBACK_STORAGE_TYPE:-}
+      - FALLBACK_STORAGE_URL=${FALLBACK_STORAGE_URL:-}
+      - FALLBACK_STORAGE_HOST=${FALLBACK_STORAGE_HOST:-}
+      - FALLBACK_STORAGE_PORT=${FALLBACK_STORAGE_PORT:-}
+      - FALLBACK_STORAGE_DATABASE=${FALLBACK_STORAGE_DATABASE:-}
+      - FALLBACK_STORAGE_USERNAME=${FALLBACK_STORAGE_USERNAME:-}
+      - FALLBACK_STORAGE_PASSWORD=${FALLBACK_STORAGE_PASSWORD:-}
+
+      # Redis 远程配置
+      - ENABLE_QUEUE=${ENABLE_QUEUE:-false}
+      - REDIS_HOST=${REDIS_HOST:-}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      - REDIS_DB=${REDIS_DB:-0}
+      - REDIS_URL=${REDIS_URL:-}
+
+      # 应用配置
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET:-your-webhook-secret-here}
+      - WEBHOOK_BATCH_SIZE=${WEBHOOK_BATCH_SIZE:-100}
+      - WEBHOOK_BATCH_TIMEOUT=${WEBHOOK_BATCH_TIMEOUT:-5000}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+
+    volumes:
+      - ./logs:/app/logs
+      - webhook_data:/app/data  # SQLite 数据持久化
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  webhook_data:
+    driver: local
