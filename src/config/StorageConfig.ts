@@ -77,7 +77,7 @@ const configSchema = Joi.object({
     redis: Joi.object({
       host: Joi.string().default('localhost'),
       port: Joi.number().default(6379),
-      password: Joi.string().optional(),
+      password: Joi.string().optional().allow('', null),
       db: Joi.number().default(0),
     }).optional(),
     batchSize: Joi.number().min(1).max(1000).default(100),
@@ -114,7 +114,7 @@ export class ConfigManager {
         redis: {
           host: process.env.REDIS_HOST || 'localhost',
           port: parseInt(process.env.REDIS_PORT || '6379'),
-          password: process.env.REDIS_PASSWORD,
+          password: process.env.REDIS_PASSWORD || undefined,
           db: parseInt(process.env.REDIS_DB || '0'),
         },
         batchSize: parseInt(process.env.QUEUE_BATCH_SIZE || '100'),
