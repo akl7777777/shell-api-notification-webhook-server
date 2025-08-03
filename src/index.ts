@@ -28,24 +28,13 @@ const wss = new WebSocketServer({ server });
 // Setup WebSocket
 setupWebSocket(wss);
 
-// Middleware - 针对 HTTP 环境优化的安全配置
+// Middleware - 为HTTP环境完全禁用有问题的安全头
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-      fontSrc: ["'self'", "data:"],
-      imgSrc: ["'self'", "data:", "blob:"],
-      connectSrc: ["'self'", "ws:", "wss:", "http:", "https:"],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'"],
-      frameSrc: ["'none'"],
-    },
-  },
-  crossOriginOpenerPolicy: false, // 在 HTTP 环境下禁用
-  crossOriginResourcePolicy: false, // 在 HTTP 环境下禁用
-  originAgentCluster: false, // 在 HTTP 环境下禁用
+  contentSecurityPolicy: false, // 完全禁用CSP以避免HTTP环境问题
+  crossOriginOpenerPolicy: false,
+  crossOriginResourcePolicy: false,
+  originAgentCluster: false,
+  crossOriginEmbedderPolicy: false,
 }));
 
 app.use(cors({
@@ -54,6 +43,15 @@ app.use(cors({
 }));
 
 app.use(morgan('combined'));
+
+// 禁用缓存以避免304问题
+app.use((_req, res, next) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
+});
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
