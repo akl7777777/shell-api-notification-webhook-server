@@ -51,6 +51,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static files (for the web interface)
+app.use('/dist', express.static(path.join(__dirname, '../public/dist')));
 app.use(express.static(path.join(__dirname, '../public')));
 
 // Routes

@@ -10,6 +10,10 @@ dist
 build
 out
 
+# Frontend node_modules (will be installed in Docker)
+frontend/node_modules
+frontend/dist
+
 # Environment files (except templates)
 .env
 .env.*
@@ -123,10 +127,14 @@ __tests__/
 .editorconfig
 jest.config*
 babel.config*
-webpack.config*
+# webpack.config*  # Allow webpack config for frontend builds
 rollup.config*
 # tsconfig.json  # Allow this for Docker builds
 jsconfig.json
+
+# Allow frontend webpack config
+!frontend/webpack.config.js
+!frontend/tsconfig.json
 
 # Scripts (don't copy shell scripts)
 start.sh

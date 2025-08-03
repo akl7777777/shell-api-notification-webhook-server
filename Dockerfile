@@ -14,9 +14,12 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# 安装依赖（包括开发依赖）
-# 使用 npm install 自动生成 package-lock.json
+# 安装后端依赖（包括开发依赖）
 RUN npm install
+
+# 复制前端 package 文件并安装前端依赖
+COPY frontend/package*.json ./frontend/
+RUN cd frontend && npm install
 
 # 复制源代码
 COPY . .
@@ -24,7 +27,7 @@ COPY . .
 # 生成 Prisma 客户端
 RUN npx prisma generate
 
-# 构建 TypeScript
+# 构建前端和后端
 RUN npm run build
 
 # 生产阶段
@@ -54,7 +57,6 @@ COPY package*.json ./
 COPY prisma ./prisma/
 
 # 只安装生产依赖
-# 使用 npm install 自动生成 package-lock.json
 RUN npm install --only=production && npm cache clean --force
 
 # 从构建阶段复制构建产物

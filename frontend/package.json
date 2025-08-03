@@ -1,0 +1,58 @@
+{
+  "name": "webhook-dashboard",
+  "version": "1.0.0",
+  "description": "Modern React dashboard for webhook message management",
+  "private": true,
+  "scripts": {
+    "dev": "webpack serve --mode development",
+    "build": "webpack --mode production",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "antd": "^5.12.8",
+    "@ant-design/icons": "^5.2.6",
+    "dayjs": "^1.11.10",
+    "axios": "^1.6.2",
+    "react-router-dom": "^6.20.1",
+    "zustand": "^4.4.7",
+    "react-query": "^3.39.3",
+    "recharts": "^2.8.0",
+    "react-highlight-words": "^0.20.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.42",
+    "@types/react-dom": "^18.2.17",
+    "@types/react-highlight-words": "^0.16.7",
+    "typescript": "^5.3.2",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1",
+    "html-webpack-plugin": "^5.5.3",
+    "ts-loader": "^9.5.1",
+    "css-loader": "^6.8.1",
+    "style-loader": "^3.3.3",
+    "less": "^4.2.0",
+    "less-loader": "^11.1.3",
+    "@typescript-eslint/eslint-plugin": "^6.13.1",
+    "@typescript-eslint/parser": "^6.13.1",
+    "eslint": "^8.54.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

@@ -1,4 +1,24 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Modern webhook message management dashboard"><meta name="keywords" content="webhook, notifications, dashboard, real-time"><title>Webhook Dashboard - Modern Message Management</title><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"><style>/* Global styles */
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Modern webhook message management dashboard">
+    <meta name="keywords" content="webhook, notifications, dashboard, real-time">
+    <title>Webhook Dashboard - Modern Message Management</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>">
+    
+    <!-- Preconnect to improve performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Global styles */
         * {
             box-sizing: border-box;
         }
@@ -104,7 +124,31 @@
         
         ::-webkit-scrollbar-thumb:hover {
             background: #a8a8a8;
-        }</style></head><body><noscript><div class="error-container"><div class="error-title">JavaScript Required</div><div class="error-message">This application requires JavaScript to run. Please enable JavaScript in your browser.</div></div></noscript><div id="root"><div class="loading-container"><div><div class="loading-spinner"></div><div class="loading-text">Loading Webhook Dashboard...</div></div></div></div><script>// Error boundary fallback
+        }
+    </style>
+</head>
+<body>
+    <noscript>
+        <div class="error-container">
+            <div class="error-title">JavaScript Required</div>
+            <div class="error-message">
+                This application requires JavaScript to run. Please enable JavaScript in your browser.
+            </div>
+        </div>
+    </noscript>
+    
+    <div id="root">
+        <!-- Loading fallback -->
+        <div class="loading-container">
+            <div>
+                <div class="loading-spinner"></div>
+                <div class="loading-text">Loading Webhook Dashboard...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Error boundary fallback
         window.addEventListener('error', function(e) {
             console.error('Global error:', e.error);
             const root = document.getElementById('root');
@@ -134,4 +178,7 @@
                         console.log('SW registration failed: ', registrationError);
                     });
             });
-        }</script><script defer="defer" src="/dist/vendors.b56cf54147c6825523a1.js"></script><script defer="defer" src="/dist/main.51c66fe263950fafcaec.js"></script></body></html>
+        }
+    </script>
+</body>
+</html>

@@ -5,12 +5,16 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon src/index.ts",
-    "build": "tsc",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:backend": "tsc",
+    "build:frontend": "cd frontend && npm run build",
     "start": "node dist/index.js",
     "db:migrate": "npx prisma migrate dev",
     "db:generate": "npx prisma generate",
     "db:studio": "npx prisma studio",
-    "migrate": "ts-node src/cli/migrate.ts"
+    "migrate": "ts-node src/cli/migrate.ts",
+    "install:frontend": "cd frontend && npm install",
+    "dev:frontend": "cd frontend && npm run dev"
   },
   "keywords": [
     "webhook",
