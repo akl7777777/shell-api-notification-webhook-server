@@ -18,17 +18,29 @@ model WebhookMessage {
   values    String?  // JSON格式存储原始values数组
   timestamp BigInt   // 原始时间戳
   receivedAt DateTime @default(now()) // 服务器接收时间
-  
+
   // 请求相关信息
   userAgent String?  // User-Agent头
   sourceIp  String?  // 来源IP
   signature String?  // webhook签名
-  
+
   // 处理状态
   processed Boolean @default(false)
-  
+
   @@map("webhook_messages")
   @@index([type])
   @@index([timestamp])
   @@index([receivedAt])
+}
+
+model Admin {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  passwordHash String
+  createdAt    DateTime  @default(now())
+  lastLoginAt  DateTime?
+  isActive     Boolean   @default(true)
+
+  @@map("admins")
+  @@index([username])
 }

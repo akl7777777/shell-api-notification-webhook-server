@@ -9,8 +9,10 @@ import path from 'path';
 
 import { ConfigManager } from './config/StorageConfig';
 import { WebhookService } from './services/webhookService';
+import { AuthService } from './services/authService';
 import { webhookRouter } from './routes/webhook';
 import { apiRouter } from './routes/api';
+import { authRouter } from './routes/auth';
 import { setupWebSocket } from './websocket';
 import { errorHandler } from './middleware/errorHandler';
 
@@ -20,6 +22,7 @@ dotenv.config();
 // Initialize services
 const configManager = new ConfigManager();
 const webhookService = WebhookService.getInstance();
+const authService = AuthService.getInstance();
 
 const app = express();
 const server = createServer(app);
@@ -62,6 +65,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 // Routes
 app.use('/webhook', webhookRouter);
 app.use('/api', apiRouter);
+app.use('/auth', authRouter);
 
 // Serve the web interface
 app.get('/', (_req, res) => {
@@ -97,6 +101,9 @@ async function startServer() {
   try {
     console.log('🔧 Initializing webhook service...');
     await webhookService.initialize();
+
+    console.log('🔐 Initializing authentication service...');
+    await authService.initialize();
 
     server.listen(PORT, () => {
       const storageConfig = configManager.getStorageConfig();

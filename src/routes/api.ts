@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { WebhookService } from '../services/webhookService';
 import { WebhookQueryParams } from '../types/webhook';
+import { AuthMiddleware } from '../middleware/authMiddleware';
 
 const router = Router();
 const webhookService = WebhookService.getInstance();
@@ -8,8 +9,9 @@ const webhookService = WebhookService.getInstance();
 /**
  * Get webhook messages with pagination and filtering
  * GET /api/webhooks
+ * 需要管理员权限
  */
-router.get('/webhooks', async (req: Request, res: Response) => {
+router.get('/webhooks', AuthMiddleware.requireAuth, async (req: Request, res: Response) => {
   try {
     const queryParams: WebhookQueryParams = {
       page: req.query.page ? parseInt(req.query.page as string) : 1,
@@ -52,8 +54,9 @@ router.get('/webhooks', async (req: Request, res: Response) => {
 /**
  * Get webhook statistics
  * GET /api/webhooks/stats
+ * 需要管理员权限
  */
-router.get('/webhooks/stats', async (req: Request, res: Response) => {
+router.get('/webhooks/stats', AuthMiddleware.requireAuth, async (_req: Request, res: Response) => {
   try {
     const stats = await webhookService.getWebhookStats();
 
@@ -73,8 +76,9 @@ router.get('/webhooks/stats', async (req: Request, res: Response) => {
 /**
  * Advanced search webhook messages
  * GET /api/webhooks/search
+ * 需要管理员权限
  */
-router.get('/webhooks/search', async (req: Request, res: Response) => {
+router.get('/webhooks/search', AuthMiddleware.requireAuth, async (req: Request, res: Response) => {
   try {
     const { q: query, ...params } = req.query;
 
@@ -102,8 +106,9 @@ router.get('/webhooks/search', async (req: Request, res: Response) => {
 /**
  * Get webhook message by ID
  * GET /api/webhooks/:id
+ * 需要管理员权限
  */
-router.get('/webhooks/:id', async (req: Request, res: Response) => {
+router.get('/webhooks/:id', AuthMiddleware.requireAuth, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const message = await webhookService.getWebhookMessageById(id);
@@ -130,8 +135,9 @@ router.get('/webhooks/:id', async (req: Request, res: Response) => {
 /**
  * Mark webhook message as processed
  * PUT /api/webhooks/:id/processed
+ * 需要管理员权限
  */
-router.put('/webhooks/:id/processed', async (req: Request, res: Response) => {
+router.put('/webhooks/:id/processed', AuthMiddleware.requireAuth, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const message = await webhookService.markAsProcessed(id);
@@ -164,8 +170,9 @@ router.put('/webhooks/:id/processed', async (req: Request, res: Response) => {
 /**
  * Delete webhook message
  * DELETE /api/webhooks/:id
+ * 需要管理员权限
  */
-router.delete('/webhooks/:id', async (req: Request, res: Response) => {
+router.delete('/webhooks/:id', AuthMiddleware.requireAuth, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     await webhookService.deleteWebhookMessage(id);
@@ -193,8 +200,9 @@ router.delete('/webhooks/:id', async (req: Request, res: Response) => {
 /**
  * Get storage health status
  * GET /api/storage/health
+ * 需要管理员权限
  */
-router.get('/storage/health', async (req: Request, res: Response) => {
+router.get('/storage/health', AuthMiddleware.requireAuth, async (_req: Request, res: Response) => {
   try {
     const health = await webhookService.getHealthStatus();
 
@@ -214,8 +222,9 @@ router.get('/storage/health', async (req: Request, res: Response) => {
 /**
  * Get batch processor statistics
  * GET /api/queue/stats
+ * 需要管理员权限
  */
-router.get('/queue/stats', async (req: Request, res: Response) => {
+router.get('/queue/stats', AuthMiddleware.requireAuth, async (_req: Request, res: Response) => {
   try {
     const stats = await webhookService.getBatchStats();
 
@@ -235,8 +244,9 @@ router.get('/queue/stats', async (req: Request, res: Response) => {
 /**
  * Clean up old messages
  * DELETE /api/webhooks/cleanup
+ * 需要管理员权限
  */
-router.delete('/webhooks/cleanup', async (req: Request, res: Response) => {
+router.delete('/webhooks/cleanup', AuthMiddleware.requireAuth, async (req: Request, res: Response) => {
   try {
     const { days = 30 } = req.query;
     const daysNumber = parseInt(days as string, 10);
@@ -266,8 +276,9 @@ router.delete('/webhooks/cleanup', async (req: Request, res: Response) => {
 /**
  * Get WebSocket connection info
  * GET /api/websocket/info
+ * 需要管理员权限
  */
-router.get('/websocket/info', (req: Request, res: Response) => {
+router.get('/websocket/info', AuthMiddleware.requireAuth, (_req: Request, res: Response) => {
   const { getConnectedClientsCount } = require('../websocket');
 
   res.json({

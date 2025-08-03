@@ -6,6 +6,7 @@ import type {
   WebhookStats,
   HealthStatus,
 } from '@/types/webhook';
+import { authService } from './authService';
 
 // Create axios instance
 const api = axios.create({
@@ -16,10 +17,14 @@ const api = axios.create({
   },
 });
 
-// Request interceptor
+// Request interceptor - 添加认证token
 api.interceptors.request.use(
   (config) => {
-    // Add any auth headers here if needed
+    // 添加认证token到请求头
+    const token = authService.getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {
@@ -27,13 +32,25 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor
+// Response interceptor - 处理认证错误
 api.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
     console.error('API Error:', error);
+
+    // 处理认证错误
+    if (error.response?.status === 401) {
+      // Token过期或无效，清除本地存储
+      authService.removeToken();
+
+      // 如果不是在登录页面，重新加载页面以触发重新认证
+      if (!window.location.pathname.includes('/login')) {
+        window.location.reload();
+      }
+    }
+
     return Promise.reject(error);
   }
 );

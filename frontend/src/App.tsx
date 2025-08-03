@@ -1,6 +1,7 @@
 import React from 'react';
 import { ConfigProvider, App as AntdApp } from 'antd';
 import { WebhookDashboard } from '@/components/WebhookDashboard';
+import AuthGuard from '@/components/AuthGuard';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
@@ -38,9 +39,11 @@ const App: React.FC = () => {
   return (
     <ConfigProvider theme={theme}>
       <AntdApp>
-        <div className="App">
-          <WebhookDashboard />
-        </div>
+        <AuthGuard>
+          <div className="App">
+            <WebhookDashboard />
+          </div>
+        </AuthGuard>
       </AntdApp>
     </ConfigProvider>
   );

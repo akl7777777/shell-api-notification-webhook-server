@@ -12,6 +12,8 @@ import {
   Divider,
   Alert,
   Spin,
+  Dropdown,
+  Avatar,
 } from 'antd';
 import {
   MessageOutlined,
@@ -21,11 +23,15 @@ import {
   DatabaseOutlined,
   WifiOutlined,
   DisconnectOutlined,
+  UserOutlined,
+  LogoutOutlined,
+  SettingOutlined,
 } from '@ant-design/icons';
 import { MessageList } from './MessageList';
 import { MessageDetail } from './MessageDetail';
 import { StatisticsChart } from './StatisticsChart';
 import { useWebhooks } from '@/hooks/useWebhooks';
+import { useAuthStore } from '@/stores/authStore';
 import dayjs from 'dayjs';
 
 const { Header, Content, Sider } = Layout;
@@ -45,11 +51,40 @@ export const WebhookDashboard: React.FC = () => {
     setSelectedMessage,
   } = useWebhooks();
 
+  const { user, logout } = useAuthStore();
   const [siderCollapsed, setSiderCollapsed] = useState(false);
 
   const handleRefresh = async () => {
     await Promise.all([loadMessages(), loadStats(), loadHealth()]);
   };
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
+  const userMenuItems = [
+    {
+      key: 'profile',
+      icon: <UserOutlined />,
+      label: `用户: ${user?.username}`,
+      disabled: true,
+    },
+    {
+      type: 'divider' as const,
+    },
+    {
+      key: 'settings',
+      icon: <SettingOutlined />,
+      label: '设置',
+      disabled: true, // 暂时禁用
+    },
+    {
+      key: 'logout',
+      icon: <LogoutOutlined />,
+      label: '登出',
+      onClick: handleLogout,
+    },
+  ];
 
   const getWsStatusColor = () => {
     switch (wsStatus) {
@@ -101,15 +136,39 @@ export const WebhookDashboard: React.FC = () => {
               {getWsStatusIcon()} {wsStatus.toUpperCase()}
             </Text>
           } />
-          <Button 
-            type="primary" 
-            ghost 
+          <Button
+            type="primary"
+            ghost
             icon={<ReloadOutlined />}
             onClick={handleRefresh}
             loading={loading}
           >
             Refresh
           </Button>
+          <Dropdown
+            menu={{ items: userMenuItems }}
+            placement="bottomRight"
+            trigger={['click']}
+          >
+            <Button
+              type="primary"
+              ghost
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '4px 12px',
+              }}
+            >
+              <Avatar
+                size="small"
+                icon={<UserOutlined />}
+                style={{ marginRight: 8 }}
+              />
+              <Text style={{ color: 'white' }}>
+                {user?.username}
+              </Text>
+            </Button>
+          </Dropdown>
         </Space>
       </Header>
 
