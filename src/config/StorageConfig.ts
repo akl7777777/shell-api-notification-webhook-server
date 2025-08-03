@@ -34,15 +34,23 @@ export interface AppConfig {
 const storageConfigSchema = Joi.object({
   type: Joi.string().valid('sqlite', 'mysql', 'postgresql', 'elasticsearch').required(),
   connectionString: Joi.string().optional(),
-  host: Joi.string().optional(),
-  port: Joi.number().optional(),
+  host: Joi.string().when('type', {
+    is: Joi.string().valid('mysql', 'postgresql', 'elasticsearch'),
+    then: Joi.string().optional(),
+    otherwise: Joi.string().optional().allow('', null)
+  }),
+  port: Joi.number().when('type', {
+    is: Joi.string().valid('mysql', 'postgresql', 'elasticsearch'),
+    then: Joi.number().optional(),
+    otherwise: Joi.number().optional().allow(null)
+  }),
   database: Joi.string().when('type', {
     is: Joi.string().valid('mysql', 'postgresql'),
     then: Joi.string().optional(),
     otherwise: Joi.string().optional().allow('', null)
   }),
-  username: Joi.string().optional(),
-  password: Joi.string().optional(),
+  username: Joi.string().optional().allow('', null),
+  password: Joi.string().optional().allow('', null),
   ssl: Joi.boolean().optional(),
   maxConnections: Joi.number().min(1).max(100).optional(),
   timeout: Joi.number().min(1000).optional(),
