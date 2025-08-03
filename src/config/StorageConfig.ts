@@ -134,7 +134,7 @@ export class ConfigManager {
 
     // Only set default connection string for SQLite
     if (!connectionString && type === 'sqlite') {
-      connectionString = 'file:./dev.db';
+      connectionString = 'file:./webhook.db';
     }
 
     const config: StorageConfig = {
