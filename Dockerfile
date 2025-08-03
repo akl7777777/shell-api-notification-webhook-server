@@ -66,9 +66,11 @@ COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 # 复制其他必要文件
 COPY --chown=webhook:nodejs .env.example .env
+COPY --chown=webhook:nodejs docker-entrypoint.sh ./
+RUN chmod +x docker-entrypoint.sh
 
-# 创建日志目录
-RUN mkdir -p /app/logs && chown -R webhook:nodejs /app/logs
+# 创建数据目录和日志目录
+RUN mkdir -p /app/data /app/logs && chown -R webhook:nodejs /app/data /app/logs
 
 # 切换到非 root 用户
 USER webhook
@@ -83,5 +85,5 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 # 使用 dumb-init 作为 PID 1
 ENTRYPOINT ["dumb-init", "--"]
 
-# 启动应用
-CMD ["node", "dist/index.js"]
+# 启动应用（通过启动脚本）
+CMD ["./docker-entrypoint.sh", "node", "dist/index.js"]
