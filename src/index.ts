@@ -10,6 +10,7 @@ import path from 'path';
 import { ConfigManager } from './config/StorageConfig';
 import { WebhookService } from './services/webhookService';
 import { AuthService } from './services/authService';
+import { DatabaseService } from './services/databaseService';
 import { webhookRouter } from './routes/webhook';
 import { apiRouter } from './routes/api';
 import { authRouter } from './routes/auth';
@@ -21,6 +22,7 @@ dotenv.config();
 
 // Initialize services
 const configManager = new ConfigManager();
+const databaseService = DatabaseService.getInstance();
 const webhookService = WebhookService.getInstance();
 const authService = AuthService.getInstance();
 
@@ -78,12 +80,28 @@ app.get('/test', (_req, res) => {
 });
 
 // Health check
-app.get('/health', (_req, res) => {
-  res.json({ 
-    status: 'ok', 
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime()
-  });
+app.get('/health', async (_req, res) => {
+  try {
+    const dbHealth = await databaseService.healthCheck();
+
+    res.json({
+      status: dbHealth.status === 'healthy' ? 'ok' : 'error',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      database: dbHealth
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      database: {
+        status: 'unhealthy',
+        message: 'Health check failed',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      }
+    });
+  }
 });
 
 // Error handling
@@ -99,6 +117,9 @@ const PORT = process.env.PORT || 3000;
 // Initialize services and start server
 async function startServer() {
   try {
+    console.log('🗄️  Initializing database...');
+    await databaseService.initialize();
+
     console.log('🔧 Initializing webhook service...');
     await webhookService.initialize();
 
@@ -136,6 +157,9 @@ async function gracefulShutdown(signal: string) {
   try {
     // Close webhook service
     await webhookService.close();
+
+    // Close database service
+    await databaseService.close();
 
     // Close server
     server.close(() => {
