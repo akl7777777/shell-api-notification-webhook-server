@@ -136,10 +136,14 @@ jsconfig.json
 !frontend/webpack.config.js
 !frontend/tsconfig.json
 
-# Scripts (don't copy shell scripts)
+# Scripts (don't copy most shell scripts, but allow docker-entrypoint.sh)
 start.sh
 deploy.sh
-*.sh
+test-*.sh
+fix-*.sh
+migrate-*.sh
+# Allow docker-entrypoint.sh for container startup
+!docker-entrypoint.sh
 
 # Lock files (we'll use npm ci in Docker)
 package-lock.json
