@@ -127,12 +127,19 @@ export class ConfigManager {
 
   private parseStorageConfig(prefix: string): StorageConfig {
     const type = process.env[`${prefix}_STORAGE_TYPE`] as StorageConfig['type'] || 'sqlite';
-    
+
+    // Get connection string, but only use defaults for the correct storage type
+    let connectionString = process.env[`${prefix}_STORAGE_CONNECTION_STRING`] ||
+                          process.env[`${prefix}_STORAGE_URL`];
+
+    // Only set default connection string for SQLite
+    if (!connectionString && type === 'sqlite') {
+      connectionString = 'file:./dev.db';
+    }
+
     const config: StorageConfig = {
       type,
-      connectionString: process.env[`${prefix}_STORAGE_CONNECTION_STRING`] || 
-                       process.env[`${prefix}_STORAGE_URL`] ||
-                       (type === 'sqlite' ? 'file:./dev.db' : undefined),
+      connectionString,
       host: process.env[`${prefix}_STORAGE_HOST`],
       port: process.env[`${prefix}_STORAGE_PORT`] ?
             parseInt(process.env[`${prefix}_STORAGE_PORT`]!) : undefined,
