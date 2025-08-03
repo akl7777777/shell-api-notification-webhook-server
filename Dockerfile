@@ -69,8 +69,9 @@ COPY --chown=webhook:nodejs .env.example .env
 COPY --chown=webhook:nodejs docker-entrypoint.sh ./
 RUN chmod +x docker-entrypoint.sh
 
-# 创建数据目录和日志目录
-RUN mkdir -p /app/data /app/logs && chown -R webhook:nodejs /app/data /app/logs
+# 创建数据目录和日志目录，并设置正确的权限
+RUN mkdir -p /app/data /app/logs /app/node_modules/.prisma && \
+    chown -R webhook:nodejs /app/data /app/logs /app/node_modules
 
 # 切换到非 root 用户
 USER webhook

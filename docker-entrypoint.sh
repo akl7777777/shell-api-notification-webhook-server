@@ -36,9 +36,8 @@ else
     fi
 fi
 
-# 生成Prisma客户端（确保最新）
-echo "🔧 Generating Prisma client..."
-npx prisma generate
+# Prisma客户端已在构建时生成，跳过重新生成以避免权限问题
+echo "✅ Using pre-generated Prisma client from build stage"
 
 echo "🎯 Starting application..."
 
