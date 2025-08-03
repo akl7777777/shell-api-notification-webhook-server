@@ -26,10 +26,12 @@ import {
   UserOutlined,
   LogoutOutlined,
   SettingOutlined,
+  LockOutlined,
 } from '@ant-design/icons';
 import { MessageList } from './MessageList';
 import { MessageDetail } from './MessageDetail';
 import { StatisticsChart } from './StatisticsChart';
+import ChangePasswordModal from './ChangePasswordModal';
 import { useWebhooks } from '@/hooks/useWebhooks';
 import { useAuthStore } from '@/stores/authStore';
 import dayjs from 'dayjs';
@@ -53,6 +55,7 @@ export const WebhookDashboard: React.FC = () => {
 
   const { user, logout } = useAuthStore();
   const [siderCollapsed, setSiderCollapsed] = useState(false);
+  const [changePasswordVisible, setChangePasswordVisible] = useState(false);
 
   const handleRefresh = async () => {
     await Promise.all([loadMessages(), loadStats(), loadHealth()]);
@@ -73,10 +76,10 @@ export const WebhookDashboard: React.FC = () => {
       type: 'divider' as const,
     },
     {
-      key: 'settings',
-      icon: <SettingOutlined />,
-      label: '设置',
-      disabled: true, // 暂时禁用
+      key: 'change-password',
+      icon: <LockOutlined />,
+      label: '修改密码',
+      onClick: () => setChangePasswordVisible(true),
     },
     {
       key: 'logout',
@@ -283,6 +286,16 @@ export const WebhookDashboard: React.FC = () => {
           </Row>
         </Content>
       </Layout>
+
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        visible={changePasswordVisible}
+        onCancel={() => setChangePasswordVisible(false)}
+        onSuccess={() => {
+          // 可以在这里添加成功后的处理逻辑
+          console.log('Password changed successfully');
+        }}
+      />
     </Layout>
   );
 };
