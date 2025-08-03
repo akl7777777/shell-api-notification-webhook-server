@@ -175,12 +175,12 @@ export const useWebhooks = () => {
     loadMessages();
     loadStats();
     loadHealth();
-  }, []);
+  }, [loadMessages, loadStats, loadHealth]);
 
   // Reload messages when filters or pagination change
   useEffect(() => {
     loadMessages();
-  }, [filters, pagination.current, pagination.pageSize]);
+  }, [loadMessages]);
 
   return {
     // State

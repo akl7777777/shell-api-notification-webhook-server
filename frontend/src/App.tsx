@@ -1,24 +1,11 @@
 import React from 'react';
 import { ConfigProvider, App as AntdApp } from 'antd';
-import { QueryClient, QueryClientProvider } from 'react-query';
 import { WebhookDashboard } from '@/components/WebhookDashboard';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import 'antd/dist/reset.css';
 
 // Configure dayjs
 dayjs.extend(relativeTime);
-
-// Create a client for React Query
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: 1,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-    },
-  },
-});
 
 // Ant Design theme configuration
 const theme = {
@@ -49,15 +36,13 @@ const theme = {
 
 const App: React.FC = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ConfigProvider theme={theme}>
-        <AntdApp>
-          <div className="App">
-            <WebhookDashboard />
-          </div>
-        </AntdApp>
-      </ConfigProvider>
-    </QueryClientProvider>
+    <ConfigProvider theme={theme}>
+      <AntdApp>
+        <div className="App">
+          <WebhookDashboard />
+        </div>
+      </AntdApp>
+    </ConfigProvider>
   );
 };
 
