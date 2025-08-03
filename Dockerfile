@@ -45,6 +45,10 @@ RUN addgroup -g 1001 -S nodejs && \
 # 设置工作目录
 WORKDIR /app
 
+# 创建数据库目录并设置权限
+RUN mkdir -p /app/data && \
+    chown -R webhook:nodejs /app
+
 # 复制 package 文件
 COPY package*.json ./
 COPY prisma ./prisma/
