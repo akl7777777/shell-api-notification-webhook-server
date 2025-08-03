@@ -7,7 +7,7 @@ import { createServer } from 'http';
 import { WebSocketServer } from 'ws';
 import path from 'path';
 
-// import { ConfigManager } from './config/StorageConfig';
+import { ConfigManager } from './config/StorageConfig';
 import { WebhookService } from './services/webhookService';
 import { webhookRouter } from './routes/webhook';
 import { apiRouter } from './routes/api';
@@ -18,6 +18,7 @@ import { errorHandler } from './middleware/errorHandler';
 dotenv.config();
 
 // Initialize services
+const configManager = new ConfigManager();
 const webhookService = WebhookService.getInstance();
 
 const app = express();
@@ -87,12 +88,22 @@ async function startServer() {
     await webhookService.initialize();
 
     server.listen(PORT, () => {
+      const storageConfig = configManager.getStorageConfig();
+      const fallbackConfig = configManager.getFallbackStorageConfig();
+      const queueConfig = configManager.getQueueConfig();
+
       console.log(`🚀 Webhook server is running on port ${PORT}`);
       console.log(`📊 Web interface: http://localhost:${PORT}`);
       console.log(`🔗 Webhook endpoint: http://localhost:${PORT}/webhook`);
       console.log(`📡 API endpoint: http://localhost:${PORT}/api`);
-      console.log(`💾 Storage type: SQLite`);
-      console.log(`🔄 Queue enabled: false`);
+
+      if (fallbackConfig) {
+        console.log(`💾 Storage: ${storageConfig.type} (primary) + ${fallbackConfig.type} (fallback)`);
+      } else {
+        console.log(`💾 Storage: ${storageConfig.type}`);
+      }
+
+      console.log(`🔄 Queue enabled: ${queueConfig.enabled}`);
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);
