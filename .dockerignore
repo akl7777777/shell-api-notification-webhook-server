@@ -125,7 +125,7 @@ jest.config*
 babel.config*
 webpack.config*
 rollup.config*
-tsconfig.json
+# tsconfig.json  # Allow this for Docker builds
 jsconfig.json
 
 # Scripts (don't copy shell scripts)
@@ -152,6 +152,9 @@ prisma/migrations/
 
 # TypeScript build info
 *.tsbuildinfo
+
+# Allow tsconfig.json for Docker builds
+!tsconfig.json
 
 # Local development
 .local
