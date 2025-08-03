@@ -1,9 +1,11 @@
 # 多阶段构建 - 构建阶段
 FROM node:20-alpine AS builder
 
-# 设置 Prisma 二进制目标为 linux-musl
-ENV PRISMA_QUERY_ENGINE_BINARY=/app/node_modules/.prisma/client/libquery_engine-linux-musl.so.node
-ENV PRISMA_QUERY_ENGINE_LIBRARY=/app/node_modules/.prisma/client/libquery_engine-linux-musl.so.node
+# 安装构建依赖
+RUN apk add --no-cache \
+    openssl \
+    libc6-compat \
+    && rm -rf /var/cache/apk/*
 
 # 设置工作目录
 WORKDIR /app
@@ -27,10 +29,6 @@ RUN npm run build
 
 # 生产阶段
 FROM node:20-alpine AS production
-
-# 设置 Prisma 二进制目标为 linux-musl
-ENV PRISMA_QUERY_ENGINE_BINARY=/app/node_modules/.prisma/client/libquery_engine-linux-musl.so.node
-ENV PRISMA_QUERY_ENGINE_LIBRARY=/app/node_modules/.prisma/client/libquery_engine-linux-musl.so.node
 
 # 安装必要的系统依赖，包括 Prisma 需要的 OpenSSL
 RUN apk add --no-cache \
