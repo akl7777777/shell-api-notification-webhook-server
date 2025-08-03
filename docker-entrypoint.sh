@@ -32,7 +32,7 @@ elif [ ! -s "$DB_FILE" ]; then
 else
     # 检查是否有admins表
     echo "🔍 Checking for admins table..."
-    if npx prisma db execute --stdin <<< "SELECT name FROM sqlite_master WHERE type='table' AND name='admins';" 2>/dev/null | grep -q "admins"; then
+    if echo "SELECT name FROM sqlite_master WHERE type='table' AND name='admins';" | npx prisma db execute --stdin 2>/dev/null | grep -q "admins"; then
         echo "✅ Database and admins table exist"
         # 尝试运行迁移（如果有的话）
         if npx prisma migrate deploy 2>/dev/null; then
@@ -59,7 +59,7 @@ if [ "$NEED_INIT" = true ]; then
         echo "✅ Database schema initialized successfully"
 
         # 验证admins表是否创建成功
-        if npx prisma db execute --stdin <<< "SELECT name FROM sqlite_master WHERE type='table' AND name='admins';" 2>/dev/null | grep -q "admins"; then
+        if echo "SELECT name FROM sqlite_master WHERE type='table' AND name='admins';" | npx prisma db execute --stdin 2>/dev/null | grep -q "admins"; then
             echo "✅ Admins table created successfully"
         else
             echo "❌ Failed to create admins table"
