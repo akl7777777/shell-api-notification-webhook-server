@@ -17,7 +17,7 @@ services:
       - PRIMARY_STORAGE_TYPE=${PRIMARY_STORAGE_TYPE:-sqlite}
 
       # SQLite 配置（默认）
-      - PRIMARY_STORAGE_URL=${PRIMARY_STORAGE_URL:-file:./webhook.db}
+      - PRIMARY_STORAGE_URL=${PRIMARY_STORAGE_URL:-}
 
       # PostgreSQL 远程配置
       - PRIMARY_STORAGE_HOST=${PRIMARY_STORAGE_HOST:-}
