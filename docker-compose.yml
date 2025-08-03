@@ -59,6 +59,12 @@ services:
       - WEBHOOK_BATCH_TIMEOUT=${WEBHOOK_BATCH_TIMEOUT:-5000}
       - LOG_LEVEL=${LOG_LEVEL:-info}
 
+      # JWT 认证配置
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-24h}
+      - DEFAULT_ADMIN_USERNAME=${DEFAULT_ADMIN_USERNAME:-admin}
+      - DEFAULT_ADMIN_PASSWORD=${DEFAULT_ADMIN_PASSWORD:-admin123}
+
     volumes:
       - ./logs:/app/logs
       - webhook_data:/app/data  # SQLite 数据持久化
