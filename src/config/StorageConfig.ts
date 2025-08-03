@@ -36,7 +36,11 @@ const storageConfigSchema = Joi.object({
   connectionString: Joi.string().optional(),
   host: Joi.string().optional(),
   port: Joi.number().optional(),
-  database: Joi.string().optional(),
+  database: Joi.string().when('type', {
+    is: Joi.string().valid('mysql', 'postgresql'),
+    then: Joi.string().optional(),
+    otherwise: Joi.string().optional().allow('', null)
+  }),
   username: Joi.string().optional(),
   password: Joi.string().optional(),
   ssl: Joi.boolean().optional(),
